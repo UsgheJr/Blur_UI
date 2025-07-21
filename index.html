@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Blur Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        video {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Carica un video per oscurare volti e targhe</h2>
+        <form id="uploadForm">
+            <input type="file" id="videoInput" accept="video/*">
+            <br>
+            <button type="submit">Carica e Avvia</button>
+        </form>
+        <video id="videoPlayer" controls></video>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const videoInput = document.getElementById('videoInput');
+        const videoPlayer = document.getElementById('videoPlayer');
+
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const file = videoInput.files[0];
+            if (!file) {
+                alert("Seleziona un file video prima.");
+                return;
+            }
+
+            const videoURL = URL.createObjectURL(file);
+            videoPlayer.src = videoURL;
+            videoPlayer.load();
+            videoPlayer.play();
+
+            // Integrazione back-end da inserire qui per inviare il file al server Python
+            // Es: invio a /upload con fetch POST
+        });
+    </script>
+</body>
+</html>
