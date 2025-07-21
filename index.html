@@ -18,6 +18,7 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         input[type="file"] {
             margin: 10px 0;
@@ -26,39 +27,66 @@
             margin-top: 20px;
             max-width: 100%;
         }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Carica un video per oscurare volti e targhe</h2>
+        <h2>Oscura Volti e Targhe da Video</h2>
         <form id="uploadForm">
             <input type="file" id="videoInput" accept="video/*">
             <br>
-            <button type="submit">Carica e Avvia</button>
+            <button type="button" id="playOriginal">Carica e Avvia</button>
+            <button type="button" id="blurAndPlay">Sfoca e Avvia</button>
         </form>
         <video id="videoPlayer" controls></video>
     </div>
 
     <script>
-        const uploadForm = document.getElementById('uploadForm');
         const videoInput = document.getElementById('videoInput');
         const videoPlayer = document.getElementById('videoPlayer');
+        const playOriginal = document.getElementById('playOriginal');
+        const blurAndPlay = document.getElementById('blurAndPlay');
 
-        uploadForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+        playOriginal.addEventListener('click', function () {
+            const file = videoInput.files[0];
+            if (!file) {
+                alert("Seleziona un file video prima.");
+                return;
+            }
+            const videoURL = URL.createObjectURL(file);
+            videoPlayer.src = videoURL;
+            videoPlayer.load();
+            videoPlayer.play();
+        });
+
+        blurAndPlay.addEventListener('click', function () {
             const file = videoInput.files[0];
             if (!file) {
                 alert("Seleziona un file video prima.");
                 return;
             }
 
-            const videoURL = URL.createObjectURL(file);
-            videoPlayer.src = videoURL;
-            videoPlayer.load();
-            videoPlayer.play();
+            const formData = new FormData();
+            formData.append("video", file);
 
-            // Integrazione back-end da inserire qui per inviare il file al server Python
-            // Es: invio a /upload con fetch POST
+            fetch('/blur', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const blurredURL = URL.createObjectURL(blob);
+                videoPlayer.src = blurredURL;
+                videoPlayer.load();
+                videoPlayer.play();
+            })
+            .catch(error => {
+                console.error("Errore nell'elaborazione del video:", error);
+            });
         });
     </script>
 </body>
